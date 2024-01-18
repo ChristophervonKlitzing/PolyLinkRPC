@@ -39,3 +39,4 @@ jobs:
           ./build/unit_tests.exe
         else
           ./build/unit_tests
+        fi
