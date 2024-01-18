@@ -34,4 +34,8 @@ jobs:
       run: cmake --build build --target unit_tests
 
     - name: Run Tests
-      run: ./build/unit_tests
+      run: |
+        if [ "${{ runner.os }}" = "Windows" ]; then
+          ./build/unit_tests.exe
+        else
+          ./build/unit_tests
