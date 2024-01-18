@@ -39,8 +39,4 @@ jobs:
 
     - name: Run Tests (Windows)
       if: runner.os == 'Windows'
-      run: |
-        dir build\Debug
-        dir build\tests
-        dir build *.exe
-        .\build\unit_tests.exe
+      run: .\build\Debug\unit_tests.exe
