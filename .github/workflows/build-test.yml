@@ -39,4 +39,4 @@ jobs:
 
     - name: Run Tests (Windows)
       if: runner.os == 'Windows'
-      run: ./build/unit_tests.exe
+      run: .\build\unit_tests.exe
