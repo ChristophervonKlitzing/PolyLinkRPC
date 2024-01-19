@@ -1,5 +1,5 @@
 # Features
-TODO: Implement NetworkStream and ByteBuffer and serialize task datagram using this instead
+Done: Implement NetworkStream and ByteBuffer and serialize task datagram using this instead
 TODO: Implement TaskSender and TaskReceiver
 The TaskSender and TaskReceiver should implement a version-check which checks if incoming 
 datagrams are compatible. Add dedicated version-compatibility check function for that.

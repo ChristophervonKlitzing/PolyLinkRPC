@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "bytes.h"
+#include "value.h"
 #include "versions.h"
 
 /**
@@ -24,30 +25,12 @@
  * | #extensions |
  *
  * Extension Payload:
- * | length-ext-1 | <extension-payload of arg-1> | ...
+ * | length-ext-1 | <extension-key> | <extension-payload of arg-1> | ...
  */
 
 class RPCBuffer {
  public:
   virtual BytesReference to_bytes() = 0;
-};
-
-/**
- * Mutable buffer for storing a typed value.
- * It allows for adding bytes
- */
-class Argument {
- private:
-  const std::string _type;
-  std::vector<char> _data;
-
- public:
-  Argument(const std::string &type) : _type(type) {}
-
-  const std::string &get_type() const { return this->_type; }
-  BytesReference get_value() const;
-  void append_to_value(const BytesReference &bytes);
-  std::size_t get_size() const;
 };
 
 class Task {
@@ -64,10 +47,13 @@ class Task {
   task_id_t _id;
   version_number_t _protocol_version;
   std::string _func_name;
-  std::vector<Argument> _args;
+  std::vector<Value> _args;
 
  private:
   Task();
+
+ private:
+  bool has_valid_version() const;
 
  public:
   Task(const std::string &func_name,
@@ -79,7 +65,7 @@ class Task {
 
   const std::string &get_function_name() const;
   unsigned int get_num_args() const;
-  Argument &get_argument(std::size_t idx);
+  Value &get_argument(std::size_t idx);
   void add_argument(const std::string &type);
 
   void serialize(BytesBuffer &buffer);

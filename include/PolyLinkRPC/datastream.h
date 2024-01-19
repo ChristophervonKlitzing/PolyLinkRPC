@@ -6,6 +6,7 @@
 
 #include "bytes.h"
 #include "endian_utils.h"
+#include "value.h"
 
 /**
  * This class provides system independent (e.g. endian-ness)
@@ -81,6 +82,26 @@ inline DataStream &operator>>(DataStream &stream, std::string &str) {
   const char *str_data = stream.read_data(str_size);
 
   str = std::string(str_data, str_size);
+  return stream;
+}
+
+inline DataStream &operator<<(DataStream &stream, const Value &value) {
+  stream << value.get_type();
+
+  BytesReference bref = value.get_value();
+  stream << static_cast<uint64_t>(bref.get_length());
+  stream.write_data(bref.get_memory(), bref.get_length());
+  return stream;
+}
+
+inline DataStream &operator>>(DataStream &stream, Value &value) {
+  std::string type;
+  uint64_t size;
+  stream >> type >> size;
+
+  value = Value(type);
+  const char *data = stream.read_data(size);
+  value.append_to_value(BytesReference(data, size));
   return stream;
 }
 
