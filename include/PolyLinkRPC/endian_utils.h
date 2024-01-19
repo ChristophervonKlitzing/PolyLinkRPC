@@ -43,7 +43,7 @@ EndianFormat get_endian_format();
 template <typename T, typename std::enable_if<(sizeof(T) == 8 &&
                                                std::is_integral<T>::value),
                                               bool>::type = true>
-inline T to_from_big_endian(T obj) {
+inline T to_from_endian_format(T obj, EndianFormat target_format) {
   if (get_endian_format() == EndianFormat::LittleEndian) {
     return ENDIAN_BYTE_SWAP_8(obj);
   }
@@ -62,8 +62,8 @@ inline T to_from_big_endian(T obj) {
 template <typename T, typename std::enable_if<(sizeof(T) == 4 &&
                                                std::is_integral<T>::value),
                                               bool>::type = true>
-inline T to_from_big_endian(T obj) {
-  if (get_endian_format() == EndianFormat::LittleEndian) {
+inline T to_from_endian_format(T obj, EndianFormat target_format) {
+  if (get_endian_format() != target_format) {
     return ENDIAN_BYTE_SWAP_4(obj);
   }
   return obj;
@@ -81,8 +81,8 @@ inline T to_from_big_endian(T obj) {
 template <typename T, typename std::enable_if<(sizeof(T) == 2 &&
                                                std::is_integral<T>::value),
                                               bool>::type = true>
-inline T to_from_big_endian(T obj) {
-  if (get_endian_format() == EndianFormat::LittleEndian) {
+inline T to_from_endian_format(T obj, EndianFormat target_format) {
+  if (get_endian_format() != target_format) {
     return ENDIAN_BYTE_SWAP_2(obj);
   }
   return obj;

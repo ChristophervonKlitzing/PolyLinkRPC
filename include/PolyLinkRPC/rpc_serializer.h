@@ -1,4 +1,0 @@
-#ifndef RPC_SERIALIZER_H
-#define RPC_SERIALIZER_H
-
-#endif  // RPC_SERIALIZER_H

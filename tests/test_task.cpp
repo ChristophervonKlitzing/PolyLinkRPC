@@ -43,7 +43,8 @@ void print_vec(const std::vector<char> &bytes) {
 TEST(task, serialization) {
   Task original_task("test_func", {"float"});
 
-  std::vector<char> task_data = original_task.serialize();
-  Task reconstructed_task = Task::deserialize(task_data);
+  BytesBuffer buffer;
+  original_task.serialize(buffer);
+  Task reconstructed_task = Task::deserialize(buffer);
   ASSERT_TRUE(original_task == reconstructed_task);
 };

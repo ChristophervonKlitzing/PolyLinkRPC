@@ -29,7 +29,7 @@
 
 class RPCBuffer {
  public:
-  virtual Bytes to_bytes() = 0;
+  virtual BytesReference to_bytes() = 0;
 };
 
 /**
@@ -39,13 +39,15 @@ class RPCBuffer {
 class Argument {
  private:
   const std::string _type;
+  std::vector<char> _data;
 
  public:
   Argument(const std::string &type) : _type(type) {}
 
   const std::string &get_type() const { return this->_type; }
-  Bytes get_value() const;
-  void append_to_value(const Bytes &bytes);
+  BytesReference get_value() const;
+  void append_to_value(const BytesReference &bytes);
+  std::size_t get_size() const;
 };
 
 class Task {
@@ -61,11 +63,11 @@ class Task {
  private:  // attributes
   task_id_t _id;
   version_number_t _protocol_version;
-  const std::string _func_name;
+  std::string _func_name;
   std::vector<Argument> _args;
 
  private:
-  Task(const std::string &fname, task_id_t id, version_number_t version);
+  Task();
 
  public:
   Task(const std::string &func_name,
@@ -80,8 +82,8 @@ class Task {
   Argument &get_argument(std::size_t idx);
   void add_argument(const std::string &type);
 
-  std::vector<char> serialize();
-  static Task deserialize(std::vector<char> &vec);
+  void serialize(BytesBuffer &buffer);
+  static Task deserialize(BytesBuffer &buffer);
 
   bool operator==(const Task &other);
 };

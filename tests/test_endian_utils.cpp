@@ -15,7 +15,8 @@ void test_for_type() {
   EndianFormat f = get_endian_format();
 
   T native_value = 1;
-  T big_endian_value = to_from_big_endian(native_value);
+  T big_endian_value =
+      to_from_endian_format(native_value, EndianFormat::BigEndian);
 
   if (f == EndianFormat::LittleEndian) {
     EXPECT_NE(native_value, big_endian_value)
@@ -29,7 +30,8 @@ void test_for_type() {
     EXPECT_TRUE(false) << "The system has an unexpected endian format";
   }
 
-  T reconstructed_native_value = to_from_big_endian(big_endian_value);
+  T reconstructed_native_value =
+      to_from_endian_format(big_endian_value, EndianFormat::BigEndian);
   EXPECT_EQ(reconstructed_native_value, native_value)
       << "Converting to big-endian and back should result in the same number";
 }

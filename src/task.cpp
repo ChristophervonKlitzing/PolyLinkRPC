@@ -3,48 +3,11 @@
 #include <cstring>
 #include <iostream>
 
+#include "PolyLinkRPC/datastream.h"
 #include "PolyLinkRPC/endian_utils.h"
 #include "PolyLinkRPC/versions.h"
 
-/**
- * Only used inside this cpp file -> template is okay
- */
-template <typename T>
-void serialize_integral_type(char **position, T value) {
-  T big_endian_value = to_from_big_endian(value);
-
-  T *typed_position = reinterpret_cast<T *>(*position);
-  *typed_position = big_endian_value;
-  (*position) += sizeof(T);
-}
-
-template <typename T>
-T deserialize_integral_type(const char **position) {
-  T big_endian_value = *reinterpret_cast<const T *>(*position);
-  (*position) += sizeof(T);
-
-  return to_from_big_endian(big_endian_value);
-}
-
-void serialize_str(char **position, const std::string &str) {
-  // prepend size of string
-  serialize_integral_type(position, static_cast<uint64_t>(str.size()));
-
-  // Append string content
-  std::memcpy(*position, str.c_str(), str.size());
-  (*position) += str.size();
-}
-std::string deserialize_str(const char **position) {
-  // read size of string
-  uint64_t str_size = deserialize_integral_type<uint64_t>(position);
-  std::string s(str_size, 'x');
-  char *dst = &s[0];
-
-  // Read string content
-  std::memcpy(dst, *position, str_size);
-  (*position) += str_size;
-  return s;
-}
+std::size_t Argument::get_size() const { return this->_data.size(); }
 
 std::atomic<Task::task_id_t> Task::_next_id = ATOMIC_VAR_INIT(0);
 
@@ -58,8 +21,7 @@ Task::Task(const std::string &func_name, const std::vector<std::string> &types)
   }
 }
 
-Task::Task(const std::string &fname, task_id_t id, version_number_t version)
-    : _id(id), _protocol_version(version), _func_name(fname) {}
+Task::Task() {}
 
 const std::string &Task::get_function_name() const { return this->_func_name; }
 
@@ -81,36 +43,28 @@ void Task::add_argument(const std::string &type) {
   this->_args.emplace_back(Argument(type));
 }
 
-std::vector<char> Task::serialize() {
-  std::size_t header_size = sizeof(this->_id) + sizeof(VERSION_NUMBER) +
-                            (this->_func_name.size() + sizeof(uint64_t)) +
-                            sizeof(uint64_t);
+void Task::serialize(BytesBuffer &buffer) {
+  DataStream stream(buffer);
 
-  std::vector<char> bytes(header_size);
-  char *pos = bytes.data();
+  // Header:
+  stream << this->_id << VERSION_NUMBER << this->_func_name
+         << static_cast<uint16_t>(this->get_num_args());
+}
+Task Task::deserialize(BytesBuffer &buffer) {
+  DataStream stream(buffer);
+  Task task;
 
-  // Header
-  serialize_integral_type(&pos, this->_id);
-  serialize_integral_type(&pos, VERSION_NUMBER);
-  serialize_str(&pos, this->_func_name);
+  stream >> task._id;
+  stream >> task._protocol_version;
 
-  // Arguments
+  // TODO: Check if datagram_version is compatible with current VERSION_NUMBER
 
-  return bytes;
+  uint16_t num_args;
+  stream >> task._func_name >> num_args;
+
+  return task;
 }
 
-Task Task::deserialize(std::vector<char> &vec) {
-  const char *pos = vec.data();
-
-  // Header
-  Task::task_id_t id = deserialize_integral_type<Task::task_id_t>(&pos);
-  version_number_t version = deserialize_integral_type<version_number_t>(&pos);
-  std::string fname = deserialize_str(&pos);
-
-  // Arguments
-
-  return Task(fname, id, version);
-}
 bool Task::operator==(const Task &other) {
   return (this->_id == other._id) &&
          (this->_protocol_version == other._protocol_version) &&
