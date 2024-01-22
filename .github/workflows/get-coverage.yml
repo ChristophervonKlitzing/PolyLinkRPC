@@ -1,0 +1,34 @@
+name: Coverage
+
+on: [push, pull_request]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up CMake
+      uses: lukka/get-cmake@latest
+      with:
+        cmakeVersion: '3.21.3'
+  
+    - name: Build and test this project
+      run: |
+        cmake . -B build -DCOMPUTE_CODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug
+        cmake --build build --target unit_tests
+        ctest --test-dir build
+    
+    - name: Install gcovr and generate the coverage file in Cobertura format
+      run: |
+        sudo apt-get install gcovr
+        gcovr -r . --xml -o coverage.xml --exclude build
+
+    - name: Code Coverage Summary Report
+      uses: irongut/CodeCoverageSummary@v1.3.0
+      with:
+        filename: coverage.xml
+        badge: true
+

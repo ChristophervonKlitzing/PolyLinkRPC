@@ -44,7 +44,19 @@ FetchContent_Declare(
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
-        
+
+
+# =========== Allow Code-Coverage ===========
+option(COMPUTE_CODE_COVERAGE "Compute the code-coverage" OFF)
+
+if (COMPUTE_CODE_COVERAGE)
+  message("Code coverage on")
+  include(CodeCoverage.cmake)
+  append_coverage_compiler_flags()
+endif(COMPUTE_CODE_COVERAGE)
+
+enable_testing()
+
 
 # =============== Unit-testing ==============:
 
