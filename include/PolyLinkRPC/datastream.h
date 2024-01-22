@@ -34,13 +34,16 @@ class DataStream {
   inline EndianFormat get_byte_order() const { return this->_byte_order; }
 
   inline void write_data(const char *data, std::size_t len) {
-    char *array = this->_buffer.get_range(this->_write_position, len);
-    std::memcpy(array, data, len);
-    this->_write_position += len;
+    if (len > 0) {
+      char *array = this->_buffer.get_range(this->_write_position, len);
+      std::memcpy(array, data, len);
+      this->_write_position += len;
+    }
   }
 
   inline const char *read_data(std::size_t len) {
-    char *array = this->_buffer.get_range(this->_read_position, len);
+    const BytesBuffer &const_buffer = this->_buffer;
+    const char *array = const_buffer.get_range(this->_read_position, len);
     this->_read_position += len;
     return array;
   }

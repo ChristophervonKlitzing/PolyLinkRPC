@@ -32,14 +32,6 @@ TEST(task, basic) {
   ASSERT_STREQ(actual_arg_type.c_str(), new_arg_type.c_str());
 }
 
-void print_vec(const std::vector<char> &bytes) {
-  std::string s("vec ");
-  for (char c : bytes) {
-    s += " " + std::to_string(c);
-  }
-  std::cerr << s << std::endl;
-};
-
 TEST(task, serialization) {
   Task original_task("test_func", {"float"});
 
