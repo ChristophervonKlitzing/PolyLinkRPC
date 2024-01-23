@@ -24,7 +24,7 @@ jobs:
     - name: Install gcovr and generate the coverage file in Cobertura format
       run: |
         sudo apt-get install gcovr
-        gcovr -r . --xml -o coverage.xml \
+        gcovr -r . --xml -o coverage.xml --exclude-unreachable-branches --exclude-throw-branches \
           --filter 'src/.*\.cpp$' \
           --filter 'include/.*/.*\.hpp$' \
           --exclude 'src/main.cpp'

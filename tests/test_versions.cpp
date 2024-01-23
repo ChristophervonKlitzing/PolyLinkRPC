@@ -18,9 +18,14 @@ TEST(versions, translation) {
   }
 }
 
-TEST(versions, invalid) {
+TEST(versions, out_of_range) {
   EXPECT_THROW(versionStringToNumber("32.0.0"), std::invalid_argument);
   EXPECT_THROW(versionStringToNumber("0.32.0"), std::invalid_argument);
   EXPECT_THROW(versionStringToNumber("0.0.64"), std::invalid_argument);
   EXPECT_THROW(versionStringToNumber("32.32.64"), std::invalid_argument);
+}
+
+TEST(versions, invalid) {
+  EXPECT_THROW(versionStringToNumber("."), std::invalid_argument);
+  EXPECT_THROW(versionStringToNumber("0a0a0"), std::invalid_argument);
 }

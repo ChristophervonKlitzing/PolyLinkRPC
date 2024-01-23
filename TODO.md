@@ -14,7 +14,7 @@ TODO: Add implementation for local communication which skips the serialization, 
 This makes it possible to run tasks locally or remote using the same API (but on different TaskSender instances).
 
 # Dev scripts
-TODO: Add script for computing the code-coverage locally
+Done: Add script for computing the code-coverage locally
 
 # CI/CD
 TODO: Split test workflow into three workflows and add badges individually to the README in a table

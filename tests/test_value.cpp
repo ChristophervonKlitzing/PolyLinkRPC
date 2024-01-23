@@ -17,3 +17,20 @@ TEST(value, basic) {
   ASSERT_EQ(sizeof(data), length);
   v.append_to_value(data, sizeof(data));
 }
+
+TEST(value, equal_operator) {
+  {
+    // Different type
+    Value v1("v1");
+    Value v2("v2");
+    ASSERT_FALSE(v1 == v2);
+  }
+
+  {
+    // Same type, different data
+    Value v1("v");
+    Value v2("v");
+    v1.append_to_value("x", 1);
+    ASSERT_FALSE(v1 == v2);
+  }
+}
