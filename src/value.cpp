@@ -4,11 +4,11 @@
 
 std::size_t Value::get_size() const { return this->_data.size(); }
 
-void Value::append_to_value(const BytesReference &bytes) {
-  if (bytes.get_length() > 0) {
+void Value::append_to_value(const char *data, std::size_t len) {
+  if (len > 0) {
     std::size_t current_size = this->_data.size();
-    this->_data.resize(current_size + bytes.get_length());
-    std::memcpy(&_data[current_size], bytes.get_memory(), bytes.get_length());
+    this->_data.resize(current_size + len);
+    std::memcpy(&_data[current_size], data, len);
   }
 }
 

@@ -103,7 +103,7 @@ inline DataStream &operator>>(DataStream &stream, Value &value) {
 
   value = Value(type);
   const char *data = stream.read_data(size);
-  value.append_to_value(BytesReference(data, size));
+  value.append_to_value(data, size);
   return stream;
 }
 

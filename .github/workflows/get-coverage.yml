@@ -24,7 +24,10 @@ jobs:
     - name: Install gcovr and generate the coverage file in Cobertura format
       run: |
         sudo apt-get install gcovr
-        gcovr -r . --xml -o coverage.xml --exclude build
+        gcovr -r . --xml -o coverage.xml \
+          --filter 'src/.*\.cpp$' \
+          --filter 'include/.*/.*\.hpp$' \
+          --exclude 'src/main.cpp'
 
     - name: Code Coverage Summary Report
       uses: irongut/CodeCoverageSummary@v1.3.0

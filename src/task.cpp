@@ -3,7 +3,7 @@
 #include <cstring>
 #include <iostream>
 
-#include "PolyLinkRPC/datastream.h"
+#include "../include/PolyLinkRPC/datastream.hpp"
 #include "PolyLinkRPC/endian_utils.h"
 #include "PolyLinkRPC/versions.h"
 
@@ -21,9 +21,14 @@ Task::Task(const std::string &func_name, const std::vector<std::string> &types)
 
 Task::Task() {}
 
-bool Task::has_valid_version() const {
+bool Task::is_compatible() const {
   // TODO: Replace with proper implementation which compares the task's version
   // number with the library version.
+  if (this->get_version_number() == INVALID_VERSION_NUMBER) {
+    // This is for unit-testing and debugging to allow this function returning
+    // false in the same process.
+    return false;
+  }
   return true;
 }
 
@@ -47,11 +52,15 @@ void Task::add_argument(const std::string &type) {
   this->_args.emplace_back(Value(type));
 }
 
+void Task::__change_version(version_number_t new_version) {
+  this->_protocol_version = new_version;
+}
+
 void Task::serialize(BytesBuffer &buffer) {
   DataStream stream(buffer);
 
   // ======== HEADER ==========:
-  stream << this->_id << VERSION_NUMBER << this->_func_name
+  stream << this->_id << this->_protocol_version << this->_func_name
          << static_cast<uint16_t>(this->get_num_args());
 
   // ======== ARGUMENTS ==========:
@@ -63,6 +72,7 @@ void Task::serialize(BytesBuffer &buffer) {
   // For now use 0 extensions as they are not supported
   stream << static_cast<uint16_t>(0);
 }
+
 Task Task::deserialize(BytesBuffer &buffer) {
   DataStream stream(buffer);
   Task task;
@@ -71,7 +81,7 @@ Task Task::deserialize(BytesBuffer &buffer) {
   stream >> task._id;
   stream >> task._protocol_version;
 
-  if (!task.has_valid_version()) {
+  if (!task.is_compatible()) {
     std::string msg =
         std::string("The decoded Task-datagram with version '") +
         versionNumberToString(task._protocol_version) +

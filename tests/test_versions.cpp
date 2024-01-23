@@ -17,3 +17,10 @@ TEST(versions, translation) {
     ASSERT_STREQ(version_string.c_str(), reconstructed_version_string.c_str());
   }
 }
+
+TEST(versions, invalid) {
+  EXPECT_THROW(versionStringToNumber("32.0.0"), std::invalid_argument);
+  EXPECT_THROW(versionStringToNumber("0.32.0"), std::invalid_argument);
+  EXPECT_THROW(versionStringToNumber("0.0.64"), std::invalid_argument);
+  EXPECT_THROW(versionStringToNumber("32.32.64"), std::invalid_argument);
+}

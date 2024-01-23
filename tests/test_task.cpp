@@ -37,6 +37,23 @@ TEST(task, serialization) {
 
   BytesBuffer buffer;
   original_task.serialize(buffer);
+
   Task reconstructed_task = Task::deserialize(buffer);
   ASSERT_TRUE(original_task == reconstructed_task);
 };
+
+TEST(task, serialization_wrong_version) {
+  Task original_task("test_func", {"float"});
+  original_task.__change_version(INVALID_VERSION_NUMBER);
+
+  BytesBuffer buffer;
+  original_task.serialize(buffer);
+
+  EXPECT_THROW(Task::deserialize(buffer), std::runtime_error);
+}
+
+TEST(task, version) {
+  Task t("test_func", {"float"});
+  ASSERT_EQ(t.get_version_number(), VERSION_NUMBER);
+  ASSERT_STREQ(t.get_version_string().c_str(), VERSION_STRING);
+}

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "PolyLinkRPC/datastream.h"
+#include "../include/PolyLinkRPC/datastream.hpp"
 
 TEST(datastream, basic) {
   BytesBuffer buffer;

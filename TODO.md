@@ -13,6 +13,9 @@ Example: EXPOSE func_1, func_2, add_* (regexes are possible for languages with r
 TODO: Add implementation for local communication which skips the serialization, sending and de-serialization part.
 This makes it possible to run tasks locally or remote using the same API (but on different TaskSender instances).
 
+# Dev scripts
+TODO: Add script for computing the code-coverage locally
+
 # CI/CD
 TODO: Split test workflow into three workflows and add badges individually to the README in a table
 Example:
@@ -22,13 +25,26 @@ Windows   | passing    |   built   |              |
 Linux     | passing    |   built   |              |   48%
 macOS     | passing    |   built   |              |
 
-TODO: Add test-coverage and add badge for it to the README
+DONE: Add test-coverage and add badge for it to the README
+https://www.jedsharpsoftware.com/c++/2020/09/16/CPP-CodeCoverage.html
+Instead run ctest --build in the build directory directly and install lcov
+
+Either do this:
+cmake -DCOMPUTE_CODE_COVERAGE=ON -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build --target unit_tests
+cd build
+ctest --progress # runs the unit-tests and computes the coverage
+lcov -c -d . -o main_coverage.info  # generates a coverage file
+
+Or this (try without the above):
+https://github.com/marketplace/actions/gcovr-action
 
 # Documentation
 TODO: Add documentation, demos which only apply the core functionality and use-case examples.
 TODO: Add use-case example which runs plugins written in different programming languages
 
 TODO: Automate github wiki repo using a workflow in the main repo
+Look into the Cmake which is linked in the website!
 https://medium.com/@thecybermonk/the-secret-github-wiki-repo-and-ci-cd-for-docs-fafe2583b72e
 
 # Contribution

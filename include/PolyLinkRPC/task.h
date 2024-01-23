@@ -43,7 +43,7 @@ class Task {
  private:  // static functions
   static task_id_t get_unique_id() { return Task::_next_id++; }
 
- private:  // attributes
+ protected:  // attributes // protected instead of private due to unit-tests
   task_id_t _id;
   version_number_t _protocol_version;
   std::string _func_name;
@@ -53,7 +53,7 @@ class Task {
   Task();
 
  private:
-  bool has_valid_version() const;
+  bool is_compatible() const;
 
  public:
   Task(const std::string &func_name,
@@ -70,6 +70,14 @@ class Task {
 
   void serialize(BytesBuffer &buffer);
   static Task deserialize(BytesBuffer &buffer);
+
+  /**
+   * Do not use this function if you are not sure what you are doing. This
+   * function overwrites the version of the underlying task instance which may
+   * result which may result in wrong deserialization. This function is mainly
+   * for unit-tests.
+   */
+  void __change_version(version_number_t new_version);
 
   bool operator==(const Task &other);
 };

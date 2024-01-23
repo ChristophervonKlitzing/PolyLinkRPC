@@ -20,7 +20,7 @@ class Value {
 
   const std::string &get_type() const { return this->_type; }
   BytesReference get_value() const;
-  void append_to_value(const BytesReference &bytes);
+  void append_to_value(const char *data, std::size_t len);
   std::size_t get_size() const;
 
   bool operator==(const Value &other) const;
