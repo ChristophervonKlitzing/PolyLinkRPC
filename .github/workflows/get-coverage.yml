@@ -29,9 +29,10 @@ jobs:
           --filter 'include/.*/.*\.hpp$' \
           --exclude 'src/main.cpp'
 
-    - name: Code Coverage Summary Report
-      uses: irongut/CodeCoverageSummary@v1.3.0
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       with:
-        filename: coverage.xml
-        badge: true
+        files: ./coverage.xml
 
