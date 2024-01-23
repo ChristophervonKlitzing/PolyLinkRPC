@@ -19,7 +19,7 @@ Task::Task(const std::string &func_name, const std::vector<std::string> &types)
   }
 }
 
-Task::Task() {}
+Task::Task() : _id(Task::get_unique_id()) {}
 
 bool Task::is_compatible() const {
   // TODO: Replace with proper implementation which compares the task's version
@@ -56,7 +56,7 @@ void Task::__change_version(version_number_t new_version) {
   this->_protocol_version = new_version;
 }
 
-void Task::serialize(BytesBuffer &buffer) {
+void Task::serialize(BytesBuffer &buffer) const {
   DataStream stream(buffer);
 
   // ======== HEADER ==========:

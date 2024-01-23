@@ -2,6 +2,7 @@
 #define BYTES_H
 
 #include <cstdint>
+#include <vector>
 
 class BytesReference {
  private:

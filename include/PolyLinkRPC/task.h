@@ -50,14 +50,13 @@ class Task {
   std::vector<Value> _args;
 
  private:
-  Task();
-
- private:
   bool is_compatible() const;
 
  public:
   Task(const std::string &func_name,
        const std::vector<std::string> &types = {});
+
+  Task();
 
   task_id_t get_id() const;
   std::string get_version_string() const;
@@ -68,7 +67,7 @@ class Task {
   Value &get_argument(std::size_t idx);
   void add_argument(const std::string &type);
 
-  void serialize(BytesBuffer &buffer);
+  void serialize(BytesBuffer &buffer) const;
   static Task deserialize(BytesBuffer &buffer);
 
   /**
