@@ -3,7 +3,7 @@
 #include <cstring>
 #include <iostream>
 
-#include "../include/PolyLinkRPC/datastream.hpp"
+#include "PolyLinkRPC/datastream.hpp"
 #include "PolyLinkRPC/endian_utils.h"
 #include "PolyLinkRPC/versions.h"
 
@@ -56,7 +56,13 @@ void Task::__change_version(version_number_t new_version) {
   this->_protocol_version = new_version;
 }
 
-void Task::serialize(BytesBuffer &buffer) const {
+bool Task::operator==(const Task &other) {
+  return (this->_id == other._id) &&
+         (this->_protocol_version == other._protocol_version) &&
+         (this->_func_name == other._func_name) && (this->_args == other._args);
+}
+
+void Task::serialize_to(BytesBuffer &buffer) const {
   DataStream stream(buffer);
 
   // ======== HEADER ==========:
@@ -73,46 +79,41 @@ void Task::serialize(BytesBuffer &buffer) const {
   stream << static_cast<uint16_t>(0);
 }
 
-Task Task::deserialize(BytesBuffer &buffer) {
+bool Task::deserialize_from(BytesBuffer &buffer) {
   DataStream stream(buffer);
-  Task task;
 
   // ======== HEADER ==========:
-  stream >> task._id;
-  stream >> task._protocol_version;
+  stream >> this->_id;
+  stream >> this->_protocol_version;
 
-  if (!task.is_compatible()) {
+  if (!this->is_compatible()) {
     std::string msg =
         std::string("The decoded Task-datagram with version '") +
-        versionNumberToString(task._protocol_version) +
+        versionNumberToString(this->_protocol_version) +
         "' is not compatible with the version of this library which is '" +
         VERSION_STRING + "'";
-    throw std::runtime_error(msg);
+    this->set_error_string(std::move(msg));
+    return false;
   }
 
   uint16_t num_args;
-  stream >> task._func_name >> num_args;
-  task._args.reserve(num_args);
+  stream >> this->_func_name >> num_args;
+  this->_args.reserve(num_args);
 
   // ======== ARGUMENTS ==========:
   for (unsigned int i = 0; i < num_args; ++i) {
     Value v("");
     stream >> v;
-    task._args.push_back(v);
+    this->_args.push_back(v);
   }
 
   // ======== EXTENSIONS =========:
   uint16_t num_extensions;
   stream >> num_extensions;
   if (num_extensions > 0) {
-    throw std::invalid_argument("Extensions are not supported yet");
+    this->set_error_string("Extensions are not supported yet");
+    return false;
   }
 
-  return task;
-}
-
-bool Task::operator==(const Task &other) {
-  return (this->_id == other._id) &&
-         (this->_protocol_version == other._protocol_version) &&
-         (this->_func_name == other._func_name) && (this->_args == other._args);
+  return true;
 }

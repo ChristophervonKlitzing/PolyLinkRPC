@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "bytes.h"
+#include "datagram_serializable.h"
 #include "value.h"
 #include "versions.h"
 
@@ -28,12 +29,7 @@
  * | length-ext-1 | <extension-key> | <extension-payload of arg-1> | ...
  */
 
-class RPCBuffer {
- public:
-  virtual BytesReference to_bytes() = 0;
-};
-
-class Task {
+class Task : public DatagramSerializable {
  public:  // type-defs
   using task_id_t = std::uint64_t;
 
@@ -67,14 +63,14 @@ class Task {
   Value &get_argument(std::size_t idx);
   void add_argument(const std::string &type);
 
-  void serialize(BytesBuffer &buffer) const;
-  static Task deserialize(BytesBuffer &buffer);
+  void serialize_to(BytesBuffer &buffer) const override;
+  bool deserialize_from(BytesBuffer &buffer) override;
 
   /**
    * Do not use this function if you are not sure what you are doing. This
-   * function overwrites the version of the underlying task instance which may
-   * result which may result in wrong deserialization. This function is mainly
-   * for unit-tests.
+   * function overwrites the version of the underlying task instance which
+   * may result which may result in wrong deserialization. This function is
+   * mainly for unit-tests.
    */
   void __change_version(version_number_t new_version);
 
