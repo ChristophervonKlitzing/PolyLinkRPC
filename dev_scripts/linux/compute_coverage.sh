@@ -1,8 +1,7 @@
-# Bash script for computing the test-coverage and visualizing it using html
+source $(dirname "$0")/build_debug.sh
 
-cmake -DCOMPUTE_CODE_COVERAGE=ON -B build -DCMAKE_BUILD_TYPE=Debug 
-cmake --build build --target unit_tests
-ctest --test-dir build  # creates coverage data
+# create coverage data
+ctest --test-dir build  
 
 # Generate coverage output
 gcovr --root . --html-details build/coverage_html/ --exclude-unreachable-branches --exclude-throw-branches --html-details-syntax-highlighting --branches --txt \

@@ -1,0 +1,25 @@
+name: Valgrind
+
+on: [push, pull_request]
+
+jobs:
+  run-valgrind:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up CMake
+      uses: lukka/get-cmake@latest
+      with:
+        cmakeVersion: '3.21.3'
+    
+    - name: Install Valgrind
+      run: sudo apt-get install valgrind
+  
+    - name: Build the unit-tests and run valgrind
+      run: |
+        cmake . -B build -DCOMPUTE_CODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug CMAKE_CXX_FLAGS="-g"
+        cmake --build build --target unit_tests
+        valgrind --leak-check=yes --error-exitcode=1 build/unit_tests
