@@ -20,6 +20,6 @@ jobs:
   
     - name: Build the unit-tests and run valgrind
       run: |
-        cmake . -B build -DCOMPUTE_CODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug CMAKE_CXX_FLAGS="-g"
+        cmake . -B build -DCOMPUTE_CODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug -D CMAKE_CXX_FLAGS="-g"
         cmake --build build --target unit_tests
         valgrind --leak-check=yes --error-exitcode=1 build/unit_tests
