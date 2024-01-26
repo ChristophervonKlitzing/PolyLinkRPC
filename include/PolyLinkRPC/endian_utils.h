@@ -88,4 +88,19 @@ inline T to_from_endian_format(T obj, EndianFormat target_format) {
   return obj;
 }
 
+/**
+ * If the system uses little-endian (determined at runtime):
+ * Swaps between the little-endian and big-endian representation of a 1 byte
+ * integral-type value. IN THIS CASE, THIS FUNCTION DOES NOTHING as 1 byte is
+ * the same for little and big-endian systems.
+ *
+ * Just returns the input value.
+ */
+template <typename T, typename std::enable_if<(sizeof(T) == 1 &&
+                                               std::is_integral<T>::value),
+                                              bool>::type = true>
+inline T to_from_endian_format(T obj, EndianFormat target_format) {
+  return obj;
+}
+
 #endif  // ENDIAN_UTILS_HPP

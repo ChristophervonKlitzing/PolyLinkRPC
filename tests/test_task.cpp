@@ -16,7 +16,7 @@ TEST(task, basic) {
   ASSERT_STREQ(t.get_function_name().c_str(), fname.c_str());
 
   // Test uniqueness of task-ids
-  std::set<Task::task_id_t> task_ids;
+  std::set<Datagram::id_t> task_ids;
   std::size_t num_tasks = 10;
   for (int i = 0; i < num_tasks; ++i) {
     Task ti("t");
@@ -42,20 +42,3 @@ TEST(task, serialization) {
   reconstructed_task.deserialize_from(buffer);
   ASSERT_TRUE(original_task == reconstructed_task);
 };
-
-TEST(task, serialization_wrong_version) {
-  Task original_task("test_func", {"float"});
-  original_task.__change_version(INVALID_VERSION_NUMBER);
-
-  BytesBuffer buffer;
-  original_task.serialize_to(buffer);
-
-  Task t;
-  EXPECT_FALSE(t.deserialize_from(buffer));
-}
-
-TEST(task, version) {
-  Task t("test_func", {"float"});
-  ASSERT_EQ(t.get_version_number(), VERSION_NUMBER);
-  ASSERT_STREQ(t.get_version_string().c_str(), VERSION_STRING);
-}

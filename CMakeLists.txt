@@ -4,6 +4,10 @@ project(PolyLinkRPC)
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 14)
 
+# Find and link against the thread library
+find_package(Threads REQUIRED)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+
 # Add subdirectory for source files and test files
 add_subdirectory(src)
 add_subdirectory(tests)
@@ -19,6 +23,7 @@ target_include_directories(app PRIVATE include/)
 # Build library
 add_library(libPolyLinkRPC STATIC ${SOURCES})
 target_include_directories(libPolyLinkRPC PRIVATE include/)
+target_link_libraries(libPolyLinkRPC PRIVATE Threads::Threads)
 
 # Specifies custom install directory e.g. for development
 set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/install")
