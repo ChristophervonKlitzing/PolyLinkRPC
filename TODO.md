@@ -1,4 +1,11 @@
 # Features
+TODO: Cleanup classes 
+- Implement Result and write tests for it (commit changes)
+- TaskSender callback should take a result instead of a task
+- Create TaskReceiver
+- Write tests for the TaskSender
+- Replace DataStream with ReadOnlyDataStream and 
+
 Done: Implement NetworkStream and ByteBuffer and serialize task datagram using this instead
 TODO: Implement TaskSender and TaskReceiver
 The TaskSender and TaskReceiver should implement a version-check which checks if incoming 

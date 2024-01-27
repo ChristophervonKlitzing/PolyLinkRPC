@@ -39,6 +39,7 @@ class BytesBuffer {
                                     std::size_t length) const {
     return &this->_buffer[0] + start;
   }
+  inline void clear() { this->_buffer.clear(); }
 };
 
 #endif  // BYTES_H

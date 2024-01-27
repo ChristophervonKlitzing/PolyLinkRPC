@@ -26,7 +26,7 @@ class Datagram {
   void set_id(id_t new_id);
   id_t get_id() const;
   virtual void serialize_to(BytesBuffer &buffer) const = 0;
-  virtual bool deserialize_from(BytesBuffer &buffer) = 0;
+  virtual bool deserialize_from(const BytesBuffer &buffer) = 0;
   const std::string &get_error_string() const;
 
   virtual ~Datagram() = default;

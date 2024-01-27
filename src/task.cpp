@@ -33,43 +33,43 @@ bool Task::operator==(const Task &other) {
 }
 
 void Task::serialize_to(BytesBuffer &buffer) const {
-  DataStream stream(buffer);
+  WritableDataStream write_stream(buffer);
 
   // ======== HEADER ==========:
-  stream << this->get_id() << this->_func_name
-         << static_cast<uint16_t>(this->get_num_args());
+  write_stream << this->get_id() << this->_func_name
+               << static_cast<uint16_t>(this->get_num_args());
 
   // ======== ARGUMENTS ==========:
   for (const Value &arg : this->_args) {
-    stream << arg;
+    write_stream << arg;
   }
 
   // ======== EXTENSIONS =========:
   // For now use 0 extensions as they are not supported
-  stream << static_cast<uint16_t>(0);
+  write_stream << static_cast<uint16_t>(0);
 }
 
-bool Task::deserialize_from(BytesBuffer &buffer) {
-  DataStream stream(buffer);
+bool Task::deserialize_from(const BytesBuffer &buffer) {
+  ReadableDataStream read_stream(buffer);
 
   // ======== HEADER ==========:
   Datagram::id_t id;
-  stream >> id;
+  read_stream >> id;
   this->set_id(id);
   uint16_t num_args;
-  stream >> this->_func_name >> num_args;
+  read_stream >> this->_func_name >> num_args;
   this->_args.reserve(num_args);
 
   // ======== ARGUMENTS ==========:
   for (unsigned int i = 0; i < num_args; ++i) {
     Value v("");
-    stream >> v;
+    read_stream >> v;
     this->_args.push_back(v);
   }
 
   // ======== EXTENSIONS =========:
   uint16_t num_extensions;
-  stream >> num_extensions;
+  read_stream >> num_extensions;
   if (num_extensions > 0) {
     this->set_error_string("Extensions are not supported yet");
     return false;

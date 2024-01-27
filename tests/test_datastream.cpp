@@ -16,21 +16,22 @@ EndianFormat get_target_format() {
 template <typename T>  // T should be an integral type
 void test_stream_integral_types() {
   BytesBuffer buffer;
-  DataStream stream(buffer);
-  stream.set_byte_order(get_target_format());
+  WritableDataStream write_stream(buffer);
+  write_stream.set_byte_order(get_target_format());
 
-  stream << static_cast<T>(10);
+  write_stream << static_cast<T>(10);
   ASSERT_EQ(buffer.size(), sizeof(T));
 
-  stream << static_cast<uint64_t>(42);
+  write_stream << static_cast<uint64_t>(42);
   ASSERT_EQ(buffer.size(), sizeof(T) + sizeof(uint64_t));
 
+  ReadableDataStream read_stream(buffer);
   T v1;
-  stream >> v1;
+  read_stream >> v1;
   ASSERT_EQ(v1, 10);
 
   uint64_t v2;
-  stream >> v2;
+  read_stream >> v2;
   ASSERT_EQ(v2, 42);
 }
 
@@ -50,29 +51,31 @@ TEST(datastream, integral_types) {
 
 TEST(datastream, string) {
   BytesBuffer buffer;
-  DataStream stream(buffer);
-  stream.set_byte_order(get_target_format());
+  WritableDataStream write_stream(buffer);
+  write_stream.set_byte_order(get_target_format());
 
   const std::string str = "Test";
-  stream << str;
+  write_stream << str;
 
   ASSERT_GE(buffer.size(), str.length());
 
+  ReadableDataStream read_stream(buffer);
   std::string str_new;
-  stream >> str_new;
+  read_stream >> str_new;
   ASSERT_STREQ(str.c_str(), str_new.c_str());
 }
 
 TEST(datastream, empty_string) {
   BytesBuffer buffer;
-  DataStream stream(buffer);
-  stream.set_byte_order(get_target_format());
+  WritableDataStream write_stream(buffer);
+  write_stream.set_byte_order(get_target_format());
 
   const std::string str = "";
-  stream << str;
+  write_stream << str;
 
+  ReadableDataStream read_stream(buffer);
   std::string str_new;
-  stream >> str_new;
+  read_stream >> str_new;
   ASSERT_EQ(str.size(), str_new.size());
   ASSERT_EQ(str_new.size(), 0);
 }

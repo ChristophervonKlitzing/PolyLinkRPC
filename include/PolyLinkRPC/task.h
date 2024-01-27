@@ -45,7 +45,7 @@ class Task : public Datagram {
   void add_argument(const std::string &type);
 
   void serialize_to(BytesBuffer &buffer) const override;
-  bool deserialize_from(BytesBuffer &buffer) override;
+  bool deserialize_from(const BytesBuffer &buffer) override;
 
   bool operator==(const Task &other);
 };
