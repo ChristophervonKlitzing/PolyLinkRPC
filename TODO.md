@@ -1,7 +1,5 @@
 # Features
 TODO: Cleanup classes 
-- Implement Result and write tests for it (commit changes)
-- TaskSender callback should take a result instead of a task
 - Create TaskReceiver
 - Write tests for the TaskSender
 - Replace DataStream with ReadOnlyDataStream and 

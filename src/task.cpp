@@ -1,7 +1,6 @@
 #include "PolyLinkRPC/task.h"
 
 #include <cstring>
-#include <iostream>
 
 #include "PolyLinkRPC/datastream.hpp"
 #include "PolyLinkRPC/endian_utils.h"
