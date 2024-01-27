@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <bitset>
+
 #include "../include/PolyLinkRPC/datastream.hpp"
 #include "PolyLinkRPC/endian_utils.h"
 
@@ -14,10 +16,10 @@ EndianFormat get_target_format() {
 }
 
 template <typename T>  // T should be an integral type
-void test_stream_integral_types() {
+void test_stream_integral_types_endian(EndianFormat f) {
   BytesBuffer buffer;
   WritableDataStream write_stream(buffer);
-  write_stream.set_byte_order(get_target_format());
+  write_stream.set_byte_order(f);
 
   write_stream << static_cast<T>(10);
   ASSERT_EQ(buffer.size(), sizeof(T));
@@ -26,13 +28,22 @@ void test_stream_integral_types() {
   ASSERT_EQ(buffer.size(), sizeof(T) + sizeof(uint64_t));
 
   ReadableDataStream read_stream(buffer);
+  read_stream.set_byte_order(f);
   T v1;
   read_stream >> v1;
-  ASSERT_EQ(v1, 10);
+  EXPECT_EQ(v1, 10) << std::bitset<sizeof(T) * 8>(static_cast<uint32_t>(10))
+                    << " " << std::bitset<sizeof(T) * 8>(v1) << " "
+                    << "Maybe you forgot to set the byte-order";
 
   uint64_t v2;
   read_stream >> v2;
   ASSERT_EQ(v2, 42);
+}
+
+template <typename T>  // T should be an integral type
+void test_stream_integral_types() {
+  test_stream_integral_types_endian<T>(EndianFormat::LittleEndian);
+  test_stream_integral_types_endian<T>(EndianFormat::BigEndian);
 }
 
 TEST(datastream, integral_types) {
@@ -60,6 +71,7 @@ TEST(datastream, string) {
   ASSERT_GE(buffer.size(), str.length());
 
   ReadableDataStream read_stream(buffer);
+  read_stream.set_byte_order(get_target_format());
   std::string str_new;
   read_stream >> str_new;
   ASSERT_STREQ(str.c_str(), str_new.c_str());
@@ -74,6 +86,7 @@ TEST(datastream, empty_string) {
   write_stream << str;
 
   ReadableDataStream read_stream(buffer);
+  read_stream.set_byte_order(get_target_format());
   std::string str_new;
   read_stream >> str_new;
   ASSERT_EQ(str.size(), str_new.size());

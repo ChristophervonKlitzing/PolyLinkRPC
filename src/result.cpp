@@ -5,6 +5,8 @@
 Result::Result(const std::string &type) : Datagram(), _value(type) {}
 Result::Result() : Datagram(), _value("") {}
 
+Value &Result::get_value() { return this->_value; }
+
 void Result::serialize_to(BytesBuffer &buffer) const {
   WritableDataStream write_stream(buffer);
   write_stream << this->get_id() << this->_value;
@@ -16,4 +18,8 @@ bool Result::deserialize_from(const BytesBuffer &buffer) {
   read_stream >> id >> this->_value;
   this->set_id(id);
   return true;
+}
+
+bool Result::operator==(const Result &other) {
+  return this->_value == other._value;
 }
