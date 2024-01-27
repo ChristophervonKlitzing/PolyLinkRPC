@@ -1,8 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <condition_variable>
-#include <mutex>
-
 #include "PolyLinkRPC/datastream.hpp"
 #include "PolyLinkRPC/task_sender.h"
 
