@@ -31,9 +31,11 @@ bool TaskSender::start() {
 }
 
 void TaskSender::stop() {
-  this->_running = false;
-  this->_comm->stop();
-  this->_thread.join();
+  if (this->_running) {
+    this->_running = false;
+    this->_comm->stop();
+    this->_thread.join();
+  }
 }
 
 void TaskSender::submit_task(const Task &t) {
@@ -41,3 +43,5 @@ void TaskSender::submit_task(const Task &t) {
   t.serialize_to(buffer);
   this->_comm->send_packet(buffer);
 }
+
+TaskSender::~TaskSender() { this->stop(); }

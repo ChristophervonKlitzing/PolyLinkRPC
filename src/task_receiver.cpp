@@ -11,13 +11,13 @@ void TaskReceiver::_handle_connection() {
 
     Task t;
     t.deserialize_from(buffer);
-    this->_on_task_callback(t);
+    this->_on_task_callback(t, *this);
   }
 }
 
 TaskReceiver::TaskReceiver(
     Communication *comm,
-    const std::function<void(const Task &)> &on_task_callback)
+    const std::function<void(const Task &, TaskReceiver &)> &on_task_callback)
     : _comm(comm), _on_task_callback(on_task_callback) {}
 
 bool TaskReceiver::start() {
@@ -31,9 +31,11 @@ bool TaskReceiver::start() {
 }
 
 void TaskReceiver::stop() {
-  this->_running = false;
-  this->_comm->stop();
-  this->_thread.join();
+  if (this->_running) {
+    this->_running = false;
+    this->_comm->stop();
+    this->_thread.join();
+  }
 }
 
 void TaskReceiver::submit_result(const Result &res) {
@@ -41,3 +43,5 @@ void TaskReceiver::submit_result(const Result &res) {
   res.serialize_to(buffer);
   this->_comm->send_packet(buffer);
 }
+
+TaskReceiver::~TaskReceiver() { this->stop(); }

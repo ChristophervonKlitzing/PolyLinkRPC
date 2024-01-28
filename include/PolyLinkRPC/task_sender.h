@@ -26,6 +26,8 @@ class TaskSender {
   bool start();
   void stop();
   void submit_task(const Task &task);
+
+  ~TaskSender();
 };
 
 #endif  // TASK_SENDER_H

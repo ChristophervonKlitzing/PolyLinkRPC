@@ -11,6 +11,7 @@ class Communication {
   virtual void stop() = 0;
   virtual bool send_packet(const BytesBuffer &buffer) = 0;
   virtual bool recv_packet(BytesBuffer &buffer) = 0;
+  virtual ~Communication() = default;
 };
 
 #endif  // COMMUNICATION_H

@@ -43,10 +43,11 @@ TEST(task_receiver, send_receive_callback) {
 
   Task received_task;
 
-  std::function<void(const Task &)> task_callback = [&](const Task &t) {
-    received_task = t;
-    received = true;
-  };
+  std::function<void(const Task &, TaskReceiver &)> task_callback =
+      [&](const Task &t, TaskReceiver &) {
+        received_task = t;
+        received = true;
+      };
 
   MockCommunicationWorking comm;
   TaskReceiver receiver(&comm, task_callback);
@@ -89,9 +90,10 @@ class MockCommunicationFailingStartup : public Communication {
 }  // anonymous namespace
 
 TEST(task_receiver, failing_startup) {
-  std::function<void(const Task &)> task_callback = [](const Task &t) {
-    // should never be called
-  };
+  std::function<void(const Task &, TaskReceiver &)> task_callback =
+      [](const Task &t, TaskReceiver &) {
+        // should never be called
+      };
 
   MockCommunicationFailingStartup comm;
   TaskReceiver sender(&comm, task_callback);
@@ -118,10 +120,11 @@ class MockCommunicationFailingReceive : public Communication {
 
 TEST(task_receiver, failing_receive) {
   int task_callback_count = 0;
-  std::function<void(const Task &)> task_callback = [&](const Task &t) {
-    // should never be called
-    task_callback_count++;
-  };
+  std::function<void(const Task &, TaskReceiver &)> task_callback =
+      [&](const Task &t, TaskReceiver &) {
+        // should never be called
+        task_callback_count++;
+      };
 
   MockCommunicationFailingReceive comm;
   TaskReceiver sender(&comm, task_callback);
