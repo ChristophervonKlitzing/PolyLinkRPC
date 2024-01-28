@@ -10,6 +10,7 @@ TEST(local_communication, basic) {
   // Initialize data variables for testing
   std::vector<Datagram::id_t> task_send_order = {1, 2, 3, 4};
   std::vector<Datagram::id_t> result_receive_order;
+  std::atomic_int16_t result_count = ATOMIC_VAR_INIT(0);
 
   // use timeout to ensure not to block the unit-tests
   auto comm_pair = LocalCommunication::create_communication_pair(100, 100);
@@ -17,6 +18,7 @@ TEST(local_communication, basic) {
   // Create task sender
   std::function<void(const Result &)> on_res_callback = [&](const Result &res) {
     result_receive_order.push_back(res.get_id());
+    result_count++;
   };
   TaskSender sender(&comm_pair.sender_comm, on_res_callback);
 
@@ -37,13 +39,9 @@ TEST(local_communication, basic) {
     sender.submit_task(t);
   }
 
-  while (result_receive_order.size() < task_send_order.size()) {
+  while (result_count < task_send_order.size()) {
     // wait for all results
   }
 
-  EXPECT_TRUE(task_send_order == result_receive_order)
-      << "Received value: "
-      << std::string(result_receive_order.begin(), result_receive_order.end())
-      << " "
-      << "Maybe busy wait got optimized away.";
+  EXPECT_TRUE(task_send_order == result_receive_order);
 }
