@@ -1,11 +1,6 @@
 # Features
-TODO: Cleanup classes 
-- Create TaskReceiver
-- Write tests for the TaskSender
-- Replace DataStream with ReadOnlyDataStream and 
-
 Done: Implement NetworkStream and ByteBuffer and serialize task datagram using this instead
-TODO: Implement TaskSender and TaskReceiver
+Done: Implement TaskSender and TaskReceiver
 The TaskSender and TaskReceiver should implement a version-check which checks if incoming 
 datagrams are compatible. Add dedicated version-compatibility check function for that.
 
@@ -17,6 +12,7 @@ Example: EXPOSE func_1, func_2, add_* (regexes are possible for languages with r
 
 TODO: Add implementation for local communication which skips the serialization, sending and de-serialization part.
 This makes it possible to run tasks locally or remote using the same API (but on different TaskSender instances).
+
 
 # Dev scripts
 Done: Add script for computing the code-coverage locally

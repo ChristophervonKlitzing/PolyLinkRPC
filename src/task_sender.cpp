@@ -9,16 +9,16 @@ void TaskSender::_handle_connection() {
       continue;
     }
 
-    Result t;
-    t.deserialize_from(buffer);
-    this->_on_task_callback(t);
+    Result res;
+    res.deserialize_from(buffer);
+    this->_on_result_callback(res);
   }
 }
 
 TaskSender::TaskSender(
     Communication *comm,
-    const std::function<void(const Result &)> &on_task_callback)
-    : _comm(comm), _on_task_callback(on_task_callback) {}
+    const std::function<void(const Result &)> &on_result_callback)
+    : _comm(comm), _on_result_callback(on_result_callback) {}
 
 bool TaskSender::start() {
   bool success = this->_comm->start();

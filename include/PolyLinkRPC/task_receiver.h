@@ -1,5 +1,5 @@
-#ifndef TASK_SENDER_H
-#define TASK_SENDER_H
+#ifndef TASK_RECEIVER_H
+#define TASK_RECEIVER_H
 
 #include <atomic>
 #include <functional>
@@ -9,23 +9,24 @@
 #include "result.h"
 #include "task.h"
 
-class TaskSender {
+class TaskReceiver {
  private:
   std::thread _thread;
   Communication *_comm;
   std::atomic_bool _running = ATOMIC_VAR_INIT(false);
-  std::function<void(const Result &)> _on_result_callback;
+  std::function<void(const Task &)> _on_task_callback;
 
  private:
   void _handle_connection();
 
  public:
-  TaskSender(Communication *comm,
-             const std::function<void(const Result &)> &on_result_callback);
+  TaskReceiver(Communication *comm,
+               const std::function<void(const Task &)> &on_task_callback);
 
+ public:
   bool start();
   void stop();
-  void submit_task(const Task &task);
+  void submit_result(const Result &res);
 };
 
-#endif  // TASK_SENDER_H
+#endif  // TASK_RECEIVER_H

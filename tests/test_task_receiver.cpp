@@ -1,66 +1,80 @@
 #include <gtest/gtest.h>
 
 #include "PolyLinkRPC/datastream.hpp"
-#include "PolyLinkRPC/task_sender.h"
+#include "PolyLinkRPC/task_receiver.h"
 
 namespace {  // prevent external linkage to other translation units
 class MockCommunicationWorking : public Communication {
  private:
-  std::atomic<bool> received = ATOMIC_VAR_INIT(false);
-  std::atomic<Datagram::id_t> task_id = ATOMIC_VAR_INIT(0);
+  std::atomic<bool> receive_task_set = ATOMIC_VAR_INIT(false);
+  const Task *receive_task = nullptr;
+
+ public:
+  std::atomic<bool> sent_submitted_result = ATOMIC_VAR_INIT(false);
+  Result submitted_reconstructed_result;
 
  public:
   bool start() override { return true; }
   void stop() override {}
 
   bool send_packet(const BytesBuffer &buffer) override {
-    Task t;
-    t.deserialize_from(buffer);
-    this->task_id = t.get_id();
-    this->received = true;
+    this->submitted_reconstructed_result.deserialize_from(buffer);
+    this->sent_submitted_result = true;
     return true;
   }
   bool recv_packet(BytesBuffer &buffer) override {
-    if (this->received == false) {
+    if (!this->receive_task_set) {
       return false;
     }
-    Result res;
-    res.set_id(this->task_id);
-    res.serialize_to(buffer);
+    this->receive_task->serialize_to(buffer);
+    this->receive_task_set = false;  // only simulate receiving one task
     return true;
+  }
+
+  void set_recv_task(const Task &t) {
+    this->receive_task = &t;
+    receive_task_set = true;
   }
 };
 }  // anonymous namespace
 
-TEST(task_sender, send_receive_callback) {
+TEST(task_receiver, send_receive_callback) {
   std::atomic<bool> received = ATOMIC_VAR_INIT(false);
-  std::atomic<Datagram::id_t> result_id = ATOMIC_VAR_INIT(0);
 
-  Datagram::id_t task_id = 42;
+  Task received_task;
 
-  std::function<void(const Result &)> result_callback = [&](const Result &res) {
-    result_id = res.get_id();
+  std::function<void(const Task &)> task_callback = [&](const Task &t) {
+    received_task = t;
     received = true;
   };
 
   MockCommunicationWorking comm;
-  TaskSender sender(&comm, result_callback);
+  TaskReceiver receiver(&comm, task_callback);
 
-  bool sender_started = sender.start();
-  ASSERT_TRUE(sender_started);
+  bool receiver_started = receiver.start();
+  ASSERT_TRUE(receiver_started);
 
-  Task t;
-  t.set_id(task_id);
-  sender.submit_task(t);
+  Task task_to_receive;
+  task_to_receive.set_id(42);
+  comm.set_recv_task(task_to_receive);
 
   // wait for result
   while (!received) {
-    // TODO: Change into waiting with a condition variable as it allows
-    // for a timeout
+    // wait for callback
   }
 
-  sender.stop();
-  ASSERT_EQ(task_id, result_id);
+  ASSERT_TRUE(task_to_receive == received_task);
+
+  Result res_to_submit;
+  res_to_submit.set_id(task_to_receive.get_id());
+  receiver.submit_result(res_to_submit);
+
+  while (!comm.sent_submitted_result) {
+    // wait for result being sent via the comm object
+  }
+  ASSERT_TRUE(comm.submitted_reconstructed_result == res_to_submit);
+
+  receiver.stop();
 }
 
 namespace {  // prevent external linkage to other translation units
@@ -74,13 +88,13 @@ class MockCommunicationFailingStartup : public Communication {
 };
 }  // anonymous namespace
 
-TEST(task_sender, failing_startup) {
-  std::function<void(const Result &)> result_callback = [](const Result &res) {
+TEST(task_receiver, failing_startup) {
+  std::function<void(const Task &)> task_callback = [](const Task &t) {
     // should never be called
   };
 
   MockCommunicationFailingStartup comm;
-  TaskSender sender(&comm, result_callback);
+  TaskReceiver sender(&comm, task_callback);
 
   bool sender_started = sender.start();
   EXPECT_FALSE(sender_started)
@@ -102,15 +116,15 @@ class MockCommunicationFailingReceive : public Communication {
 };
 }  // anonymous namespace
 
-TEST(task_sender, failing_receive) {
-  int result_callback_count = 0;
-  std::function<void(const Result &)> result_callback = [&](const Result &res) {
+TEST(task_receiver, failing_receive) {
+  int task_callback_count = 0;
+  std::function<void(const Task &)> task_callback = [&](const Task &t) {
     // should never be called
-    result_callback_count++;
+    task_callback_count++;
   };
 
   MockCommunicationFailingReceive comm;
-  TaskSender sender(&comm, result_callback);
+  TaskReceiver sender(&comm, task_callback);
   sender.start();
 
   while (comm.recv_call_count < 2) {
@@ -119,5 +133,5 @@ TEST(task_sender, failing_receive) {
   }
 
   sender.stop();
-  ASSERT_EQ(result_callback_count, 0);
+  ASSERT_EQ(task_callback_count, 0);
 }
