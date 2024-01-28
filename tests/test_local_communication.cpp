@@ -36,9 +36,14 @@ TEST(local_communication, basic) {
     t.set_id(id);
     sender.submit_task(t);
   }
+
   while (result_receive_order.size() < task_send_order.size()) {
     // wait for all results
   }
 
-  ASSERT_TRUE(task_send_order == result_receive_order);
+  EXPECT_TRUE(task_send_order == result_receive_order)
+      << "Received value: "
+      << std::string(result_receive_order.begin(), result_receive_order.end())
+      << " "
+      << "Maybe busy wait got optimized away.";
 }

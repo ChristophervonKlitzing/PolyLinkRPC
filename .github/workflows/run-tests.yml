@@ -19,7 +19,7 @@ jobs:
         cmakeVersion: '3.21.3'
   
     - name: Configure CMake
-      run: cmake -B build
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Debug
 
     - name: Build
       run: cmake --build build --target unit_tests
