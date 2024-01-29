@@ -4,7 +4,7 @@ Done: Implement TaskSender and TaskReceiver
 The TaskSender and TaskReceiver should implement a version-check which checks if incoming 
 datagrams are compatible. Add dedicated version-compatibility check function for that.
 
-TODO: Test TaskSender and TaskReceiver together using a dummy connection
+Done: Test TaskSender and TaskReceiver together using a dummy connection
 TODO: Add python bindings and update C++ API if necessary to obtain language independency.
 
 TODO: Add start-up protocol which allows exposing functions and checks version compatibility (maybe remove version from Task datagram).

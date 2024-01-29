@@ -9,7 +9,7 @@
 #include "result.h"
 #include "task.h"
 
-class TaskSender {
+class AsyncTaskSender {
  private:
   std::thread _thread;
   Communication *_comm;
@@ -20,14 +20,15 @@ class TaskSender {
   void _handle_connection();
 
  public:
-  TaskSender(Communication *comm,
-             const std::function<void(const Result &)> &on_result_callback);
+  AsyncTaskSender(
+      Communication *comm,
+      const std::function<void(const Result &)> &on_result_callback);
 
   bool start();
   void stop();
   void submit_task(const Task &task);
 
-  ~TaskSender();
+  ~AsyncTaskSender();
 };
 
 #endif  // TASK_SENDER_H

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
+#include "PolyLinkRPC/async_task_sender.h"
 #include "PolyLinkRPC/datastream.hpp"
-#include "PolyLinkRPC/task_sender.h"
 
 namespace {  // prevent external linkage to other translation units
 class MockCommunicationWorking : public Communication {
@@ -44,7 +44,7 @@ TEST(task_sender, send_receive_callback) {
   };
 
   MockCommunicationWorking comm;
-  TaskSender sender(&comm, result_callback);
+  AsyncTaskSender sender(&comm, result_callback);
 
   bool sender_started = sender.start();
   ASSERT_TRUE(sender_started);
@@ -80,7 +80,7 @@ TEST(task_sender, failing_startup) {
   };
 
   MockCommunicationFailingStartup comm;
-  TaskSender sender(&comm, result_callback);
+  AsyncTaskSender sender(&comm, result_callback);
 
   bool sender_started = sender.start();
   EXPECT_FALSE(sender_started)
@@ -110,7 +110,7 @@ TEST(task_sender, failing_receive) {
   };
 
   MockCommunicationFailingReceive comm;
-  TaskSender sender(&comm, result_callback);
+  AsyncTaskSender sender(&comm, result_callback);
   sender.start();
 
   while (comm.recv_call_count < 2) {

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
+#include "PolyLinkRPC/async_task_receiver.h"
 #include "PolyLinkRPC/datastream.hpp"
-#include "PolyLinkRPC/task_receiver.h"
 
 namespace {  // prevent external linkage to other translation units
 class MockCommunicationWorking : public Communication {
@@ -43,14 +43,14 @@ TEST(task_receiver, send_receive_callback) {
 
   Task received_task;
 
-  std::function<void(const Task &, TaskReceiver &)> task_callback =
-      [&](const Task &t, TaskReceiver &) {
+  std::function<void(const Task &, AsyncTaskReceiver &)> task_callback =
+      [&](const Task &t, AsyncTaskReceiver &) {
         received_task = t;
         received = true;
       };
 
   MockCommunicationWorking comm;
-  TaskReceiver receiver(&comm, task_callback);
+  AsyncTaskReceiver receiver(&comm, task_callback);
 
   bool receiver_started = receiver.start();
   ASSERT_TRUE(receiver_started);
@@ -90,13 +90,13 @@ class MockCommunicationFailingStartup : public Communication {
 }  // anonymous namespace
 
 TEST(task_receiver, failing_startup) {
-  std::function<void(const Task &, TaskReceiver &)> task_callback =
-      [](const Task &t, TaskReceiver &) {
+  std::function<void(const Task &, AsyncTaskReceiver &)> task_callback =
+      [](const Task &t, AsyncTaskReceiver &) {
         // should never be called
       };
 
   MockCommunicationFailingStartup comm;
-  TaskReceiver sender(&comm, task_callback);
+  AsyncTaskReceiver sender(&comm, task_callback);
 
   bool sender_started = sender.start();
   EXPECT_FALSE(sender_started)
@@ -120,14 +120,14 @@ class MockCommunicationFailingReceive : public Communication {
 
 TEST(task_receiver, failing_receive) {
   int task_callback_count = 0;
-  std::function<void(const Task &, TaskReceiver &)> task_callback =
-      [&](const Task &t, TaskReceiver &) {
+  std::function<void(const Task &, AsyncTaskReceiver &)> task_callback =
+      [&](const Task &t, AsyncTaskReceiver &) {
         // should never be called
         task_callback_count++;
       };
 
   MockCommunicationFailingReceive comm;
-  TaskReceiver sender(&comm, task_callback);
+  AsyncTaskReceiver sender(&comm, task_callback);
   sender.start();
 
   while (comm.recv_call_count < 2) {

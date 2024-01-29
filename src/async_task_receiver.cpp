@@ -1,6 +1,6 @@
-#include "PolyLinkRPC/task_receiver.h"
+#include "../include/PolyLinkRPC/async_task_receiver.h"
 
-void TaskReceiver::_handle_connection() {
+void AsyncTaskReceiver::_handle_connection() {
   BytesBuffer buffer;
   while (this->_running) {
     bool success = this->_comm->recv_packet(buffer);
@@ -15,22 +15,23 @@ void TaskReceiver::_handle_connection() {
   }
 }
 
-TaskReceiver::TaskReceiver(
+AsyncTaskReceiver::AsyncTaskReceiver(
     Communication *comm,
-    const std::function<void(const Task &, TaskReceiver &)> &on_task_callback)
+    const std::function<void(const Task &, AsyncTaskReceiver &)>
+        &on_task_callback)
     : _comm(comm), _on_task_callback(on_task_callback) {}
 
-bool TaskReceiver::start() {
+bool AsyncTaskReceiver::start() {
   bool success = this->_comm->start();
   if (!success) {
     return false;
   }
   this->_running = true;
-  this->_thread = std::thread(&TaskReceiver::_handle_connection, this);
+  this->_thread = std::thread(&AsyncTaskReceiver::_handle_connection, this);
   return true;
 }
 
-void TaskReceiver::stop() {
+void AsyncTaskReceiver::stop() {
   if (this->_running) {
     this->_running = false;
     this->_comm->stop();
@@ -38,10 +39,10 @@ void TaskReceiver::stop() {
   }
 }
 
-void TaskReceiver::submit_result(const Result &res) {
+void AsyncTaskReceiver::submit_result(const Result &res) {
   BytesBuffer buffer;
   res.serialize_to(buffer);
   this->_comm->send_packet(buffer);
 }
 
-TaskReceiver::~TaskReceiver() { this->stop(); }
+AsyncTaskReceiver::~AsyncTaskReceiver() { this->stop(); }

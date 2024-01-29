@@ -2,9 +2,9 @@
 
 #include <functional>
 
+#include "../include/PolyLinkRPC/async_task_receiver.h"
+#include "../include/PolyLinkRPC/async_task_sender.h"
 #include "PolyLinkRPC/local_communication.h"
-#include "PolyLinkRPC/task_receiver.h"
-#include "PolyLinkRPC/task_sender.h"
 
 TEST(local_communication, basic) {
   // Initialize data variables for testing
@@ -20,15 +20,15 @@ TEST(local_communication, basic) {
     result_receive_order.push_back(res.get_id());
     result_count++;
   };
-  TaskSender sender(&comm_pair.sender_comm, on_res_callback);
+  AsyncTaskSender sender(&comm_pair.sender_comm, on_res_callback);
 
   // Create task receiver
-  auto on_task_callback = [](const Task &t, TaskReceiver &receiver) {
+  auto on_task_callback = [](const Task &t, AsyncTaskReceiver &receiver) {
     Result res;
     res.set_id(t.get_id());
     receiver.submit_result(std::move(res));
   };
-  TaskReceiver receiver(&comm_pair.receiver_comm, on_task_callback);
+  AsyncTaskReceiver receiver(&comm_pair.receiver_comm, on_task_callback);
 
   ASSERT_TRUE(sender.start());
   ASSERT_TRUE(receiver.start());
