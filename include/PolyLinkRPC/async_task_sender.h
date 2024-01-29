@@ -1,5 +1,5 @@
-#ifndef TASK_SENDER_H
-#define TASK_SENDER_H
+#ifndef ASYNC_TASK_SENDER_H
+#define ASYNC_TASK_SENDER_H
 
 #include <atomic>
 #include <functional>
@@ -31,4 +31,4 @@ class AsyncTaskSender {
   ~AsyncTaskSender();
 };
 
-#endif  // TASK_SENDER_H
+#endif  // ASYNC_TASK_SENDER_H

@@ -1,5 +1,5 @@
-#ifndef TASK_RECEIVER_H
-#define TASK_RECEIVER_H
+#ifndef ASYNC_TASK_RECEIVER_H
+#define ASYNC_TASK_RECEIVER_H
 
 #include <atomic>
 #include <functional>
@@ -31,4 +31,4 @@ class AsyncTaskReceiver {
   ~AsyncTaskReceiver();
 };
 
-#endif  // TASK_RECEIVER_H
+#endif  // ASYNC_TASK_RECEIVER_H
