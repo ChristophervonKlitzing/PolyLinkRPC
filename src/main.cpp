@@ -7,7 +7,7 @@
 
 int main() {
   std::cout << "Hello world" << std::endl;
-  Task t("foo", {"int", "float"});
+  Task t("foo", std::vector<std::string>{"int", "float"});
   std::cout << t.get_function_name() << t.get_num_args()
             << t.get_argument(1).get_type() << std::endl;
 

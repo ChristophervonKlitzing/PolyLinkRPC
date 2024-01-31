@@ -38,6 +38,8 @@ class Task : public Datagram {
   Task(const std::string &func_name,
        const std::vector<std::string> &types = {});
 
+  Task(const std::string &func_name, const std::vector<Value> &args);
+
   Task();
   const std::string &get_function_name() const;
   unsigned int get_num_args() const;

@@ -14,6 +14,9 @@ Task::Task(const std::string &func_name, const std::vector<std::string> &types)
   }
 }
 
+Task::Task(const std::string &func_name, const std::vector<Value> &args)
+    : Datagram(), _func_name(func_name), _args(args) {}
+
 Task::Task() : Datagram() {}
 
 const std::string &Task::get_function_name() const { return this->_func_name; }

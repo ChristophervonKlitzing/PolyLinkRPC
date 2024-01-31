@@ -18,6 +18,7 @@ class LocalCommunication : public Communication {
     std::mutex lck;
     std::condition_variable cv;
     std::queue<BytesBuffer> queue;
+    bool running = false;
   };
 
  private:

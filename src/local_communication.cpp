@@ -17,12 +17,24 @@ LocalCommunicationPair LocalCommunication::create_communication_pair(
   return {/*.sender_comm=*/sender, /*.receiver_comm=*/receiver};
 }
 
-bool LocalCommunication::start() { return true; }
-void LocalCommunication::stop() {}
+bool LocalCommunication::start() {
+  std::lock_guard<std::mutex> lck_recv(this->recv_data->lck);
+  this->recv_data->running = true;
+  return true;
+}
+
+void LocalCommunication::stop() {
+  std::lock_guard<std::mutex> lck_recv(this->recv_data->lck);
+  this->recv_data->running = false;
+  this->recv_data->cv.notify_one();
+}
 
 bool LocalCommunication::send_packet(const BytesBuffer &buffer) {
   {
     std::lock_guard<std::mutex> lck(this->send_data->lck);
+    if (!this->send_data->running) {
+      return false;  // receiver has stopped -> no send
+    }
     this->send_data->queue.push(buffer);
   }
   this->send_data->cv.notify_one();  // wake-up potentially waiting recv call
@@ -32,8 +44,13 @@ bool LocalCommunication::send_packet(const BytesBuffer &buffer) {
 bool LocalCommunication::recv_packet(BytesBuffer &buffer) {
   std::unique_lock<std::mutex> lck(this->recv_data->lck);
   bool timed_out = !this->recv_data->cv.wait_for(
-      lck, std::chrono::milliseconds(this->wait_timeout_ms),
-      [this] { return !this->recv_data->queue.empty(); });
+      lck, std::chrono::milliseconds(this->wait_timeout_ms), [this] {
+        return !this->recv_data->queue.empty() || !this->recv_data->running;
+      });
+
+  if (!this->recv_data->running) {
+    return false;
+  }
 
   if (timed_out) {
     return false;

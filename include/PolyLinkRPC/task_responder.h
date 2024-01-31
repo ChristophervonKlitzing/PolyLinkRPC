@@ -1,6 +1,7 @@
 #ifndef TASK_RESPONDER_H
 #define TASK_RESPONDER_H
 
+#include "async_task_receiver.h"
 #include "communication.h"
 #include "result.h"
 #include "task.h"
@@ -17,10 +18,17 @@ class TaskExecutor {
 };
 
 class TaskResponder {
+ private:
+  AsyncTaskReceiver async_receiver;
+  TaskExecutor &executor;
+
+ private:
+  void on_task(const Task &task, AsyncTaskReceiver &receiver);
+
  public:
   TaskResponder(Communication *comm, TaskExecutor &executor);
-  bool start();
-  void stop();
+
+  ~TaskResponder();
 };
 
 #endif  // TASK_RESPONDER_H
