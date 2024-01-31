@@ -11,6 +11,10 @@ TODO: Add python bindings and update C++ API if necessary to obtain language ind
 TODO: Add start-up protocol which allows exposing functions and checks version compatibility (maybe remove version from Task datagram).
 Example: EXPOSE func_1, func_2, add_* (regexes are possible for languages with reflection like python)
 
+TODO: Reduce the amount of copying be allowing values being serialized right in place (in the byte-buffer).
+After that, things should only be serialized once directly into one large byte-buffer for the entire datagram.
+The datagram is then sent in one block using the comm. 
+
 TODO: Add implementation for local communication which skips the serialization, sending and de-serialization part.
 This makes it possible to run tasks locally or remote using the same API (but on different TaskSender instances).
 -> Support other kind of communication instead of serialization (e.g. for embedded python interpreter)

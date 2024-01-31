@@ -12,18 +12,25 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 add_subdirectory(src)
 add_subdirectory(tests)
 
+
+
 message("Sourcefiles: ${SOURCES}")
+set(HEADER_FILE_DIR ${CMAKE_SOURCE_DIR}/include/)
+message("Header file directory: ${HEADER_FILE_DIR}")
 
 
 # Build executable
 add_executable(app ${SOURCES})
-target_include_directories(app PRIVATE include/)
+target_include_directories(app PRIVATE ${HEADER_FILE_DIR})
 
 
 # Build library
 add_library(libPolyLinkRPC STATIC ${SOURCES})
-target_include_directories(libPolyLinkRPC PRIVATE include/)
+target_include_directories(libPolyLinkRPC PUBLIC ${HEADER_FILE_DIR})
 target_link_libraries(libPolyLinkRPC PRIVATE Threads::Threads)
+
+# Build bindings which depend on the library
+add_subdirectory(bindings)
 
 # Specifies custom install directory e.g. for development
 set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/install")
